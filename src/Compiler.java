@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import syntaciticAnalyzer.*;
+import transformater.GramTree;
+import transformater.SourceStream;
+import transformater.Transformater;
 import lexicalAnalyzer.*;
 import macroProcessing.*;
 
@@ -63,33 +66,7 @@ public class Compiler {
 	        pw3.close();
 	        
 	        //将分词结果转换成语法分析要用的句子保存
-	        for (TermsTable TempTable:Article){
-	        	if (!TempTable.Str.trim().isEmpty()){
-		        	if (TempTable.Kind.equals("关键字")){
-		        		if (TempTable.Str.equals("for") || TempTable.Str.equals("if") || TempTable.Str.equals("else") || TempTable.Str.equals("return") || TempTable.Str.equals("void")){
-		        			LexicalStream.Article.add(TempTable.Str);
-		        		}
-		        		else{
-		        			LexicalStream.Article.add("type");
-		        		}
-		        	}
-		        	else if (TempTable.Kind.equals("变量")){
-		        		LexicalStream.Article.add("id");
-		        	}
-		        	else if (TempTable.Kind.equals("运算符")){
-		        		LexicalStream.Article.add(TempTable.Str);
-		        	}
-		        	else if (TempTable.Kind.equals("数字常量")){
-		        		LexicalStream.Article.add("digit");
-		        	}
-		        	else if (TempTable.Kind.equals("界符")){
-		        		LexicalStream.Article.add(TempTable.Str);
-		        	}
-		        	else if (TempTable.Kind.equals("字符串常量")){
-		        		LexicalStream.Article.add("string");
-		        	}
-	        	}
-	        }
+	        SourceStream MainSourceStream = new SourceStream(Article);
 	        //LexicalStream.Show();
 	        //
 	        
@@ -104,11 +81,11 @@ public class Compiler {
 	        else{
 	        	System.out.println("语法不是LL(1)！");
 	        }
-	        MainCGramClass.IsLegal(LexicalStream.Article);
-	        
-	        
+	        GramTree MainGramTree = MainCGramClass.IsLegal(MainSourceStream);
+	        MainGramTree.Show();
+	        //翻译成BB汇编过程
+	        Transformater MainTransformater = new Transformater(MainGramTree,MainSourceStream);
         } catch (FileNotFoundException e) {
-			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
 	}

@@ -3,7 +3,7 @@ package syntaciticAnalyzer;
 import java.util.ArrayList;
 
 public class Produce {
-	ArrayList<String> Elems;
+	public ArrayList<String> Elems;
 	
 	public Produce(){
 		Elems = new ArrayList<String>();

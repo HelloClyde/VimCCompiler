@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Stack;
 
+import transformater.GramTree;
+import transformater.SourceStream;
+
 public class CGramClass {
 	/**
 	 * 测试用
@@ -75,16 +78,19 @@ public class CGramClass {
 		this.CPreciateTable.Show();
 	}
 
-	public boolean IsLegal(ArrayList<String> Article) {
+	public GramTree IsLegal(SourceStream Article) {
+		GramTree DesGramTree = new GramTree();
 		Stack<String> AnlyStack = new Stack<String>();
 		Stack<String> StrStack = new Stack<String>();
+		//语法树压入index
+		int GramIndex = 0;
 		//压入S
 		AnlyStack.push("#");
 		AnlyStack.push("【函数定义】");
 		//压入Article
 		StrStack.push("#");
-		for (int i = Article.size() - 1;i >= 0;i --){
-			StrStack.push(Article.get(i));
+		for (int i = Article.CSourceStream.size() - 1;i >= 0;i --){
+			StrStack.push(Article.CSourceStream.get(i).GramKind);
 		}
 		//步骤计数器
 		int StepsCounts;
@@ -92,7 +98,8 @@ public class CGramClass {
 		while (!(AnlyStack.isEmpty() && StrStack.isEmpty())){
 			if (AnlyStack.isEmpty() || StrStack.isEmpty()){
 				System.out.println("预测分析发生错误。分析栈或者剩余串为空");
-				return false;
+				DesGramTree.IsLegal =  false;
+				return DesGramTree;
 			}
 			else{
 				System.out.print(StepsCounts + "\t");
@@ -109,6 +116,12 @@ public class CGramClass {
 				String AnlyStr = AnlyStack.pop();
 				String StrStr = StrStack.peek();
 				if (AnlyStr.equals(StrStr)){
+					//语法树位置下移
+					if (!StrStr.equals("#")) {
+						DesGramTree.GramTreeNow.Words = Article.CSourceStream.get(GramIndex);
+						GramIndex ++;
+						DesGramTree.GramTreeNow = DesGramTree.GramTreeNow.FindNext();
+					}
 					System.out.println(StrStr + "匹配");
 					StrStack.pop();
 				}
@@ -117,11 +130,14 @@ public class CGramClass {
 					TempProduce = this.CPreciateTable.GetProduce(AnlyStr, StrStr);
 					if (TempProduce == null){
 						System.out.println(StrStr + "匹配失败");
-						return false;
+						DesGramTree.IsLegal = false;
+						return DesGramTree;
 					}
 					else{
 						TempProduce.Show();
 						System.out.println();
+						//添加入语法树
+						DesGramTree.AddProduce(TempProduce);
 						for (int i = TempProduce.Elems.size() - 1; i >= 0;i --){
 							String TempStr = TempProduce.Elems.get(i);
 							if (!TempStr.equals("$")){
@@ -134,7 +150,8 @@ public class CGramClass {
 			}
 		}
 		System.out.println("匹配成功!");
-		return true;
+		DesGramTree.IsLegal = true;
+		return DesGramTree;
 	}
 	
 	
