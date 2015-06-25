@@ -82,7 +82,7 @@ public class Compiler {
 	        	System.out.println("语法不是LL(1)！");
 	        }
 	        GramTree MainGramTree = MainCGramClass.IsLegal(MainSourceStream);
-	        MainGramTree.Show();
+	        //MainGramTree.Show();
 	        //翻译成BB汇编过程
 	        Transformater MainTransformater = new Transformater(MainGramTree,MainSourceStream);
         } catch (FileNotFoundException e) {
